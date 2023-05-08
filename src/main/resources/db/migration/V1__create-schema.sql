@@ -1,0 +1,8 @@
+CREATE SEQUENCE IF NOT EXISTS car_id;
+
+CREATE TABLE IF NOT EXISTS car (
+    id INT DEFAULT car_id.nextval PRIMARY KEY,
+    reg_number VARCHAR(7) NOT NULL,
+    make VARCHAR(20) NOT NULL,
+    colour VARCHAR(10) NOT NULL
+);

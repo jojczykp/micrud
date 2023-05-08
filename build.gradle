@@ -11,17 +11,26 @@ repositories {
 }
 
 dependencies {
+    compileOnly("org.graalvm.nativeimage:svm")
+
     annotationProcessor("io.micronaut.data:micronaut-data-processor")
     annotationProcessor("io.micronaut:micronaut-http-validation")
+
     implementation("io.micronaut:micronaut-http-client")
     implementation("io.micronaut:micronaut-jackson-databind")
+
+    annotationProcessor("io.micronaut.serde:micronaut-serde-processor")
+    implementation("io.micronaut.serde:micronaut-serde-jackson")
+
+
     implementation("io.micronaut.data:micronaut-data-jdbc")
     implementation("io.micronaut.flyway:micronaut-flyway")
     implementation("io.micronaut.sql:micronaut-jdbc-hikari")
     implementation("jakarta.annotation:jakarta.annotation-api")
-    compileOnly("org.graalvm.nativeimage:svm")
+
     runtimeOnly("ch.qos.logback:logback-classic")
     runtimeOnly("com.h2database:h2")
+
     testImplementation("org.assertj:assertj-core")
 }
 
@@ -42,6 +51,3 @@ micronaut {
         annotations("pl.jojczykp.micrud.*")
     }
 }
-
-
-
