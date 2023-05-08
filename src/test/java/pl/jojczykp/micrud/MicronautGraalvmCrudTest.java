@@ -14,7 +14,7 @@ class MicronautGraalvmCrudTest {
     EmbeddedApplication<?> application;
 
     @Test
-    void testItWorks() {
+    void shouldApplicationRun() {
         Assertions.assertTrue(application.isRunning());
     }
 

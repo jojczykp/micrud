@@ -32,6 +32,8 @@ dependencies {
     runtimeOnly("com.h2database:h2")
 
     testImplementation("org.assertj:assertj-core")
+    testImplementation("org.mockito:mockito-core")
+
 }
 
 application {
