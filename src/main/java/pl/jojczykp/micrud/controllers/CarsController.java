@@ -1,7 +1,11 @@
 package pl.jojczykp.micrud.controllers;
 
+import io.micronaut.http.HttpResponse;
+import io.micronaut.http.MediaType;
+import io.micronaut.http.annotation.Body;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
+import io.micronaut.http.annotation.Post;
 import io.micronaut.scheduling.TaskExecutors;
 import io.micronaut.scheduling.annotation.ExecuteOn;
 import pl.jojczykp.micrud.model.Car;
@@ -29,4 +33,9 @@ public class CarsController {
         return carsRepository.findByRegNumber(regNumber);
     }
 
+    @Post(consumes = MediaType.APPLICATION_JSON, produces = MediaType.APPLICATION_JSON)
+    HttpResponse<Car> post(@Body Car car) {
+        Car saved = carsRepository.save(car);
+        return HttpResponse.created(saved);
+    }
 }
