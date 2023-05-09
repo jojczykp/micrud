@@ -1,10 +1,21 @@
-# MiCRUD toy
+# MiCRUD Toy
 
 
 ## Run
 
 ```shell
 ./gradlew run
+```
+
+
+## Build/Run Native Image
+
+```shell
+./gradlew nativeCompile
+```
+
+```shell
+build/native/nativeCompile/micronaut-graalvm-crud
 ```
 
 
