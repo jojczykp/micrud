@@ -59,7 +59,7 @@ class CarsControllerTest {
         Car carSaved = new Car(1L, "QQ01YYY", "Subaru", Colour.RED);
         given(carsRepository.save(carToSave)).willReturn(carSaved);
 
-        HttpResponse<Car> response = carsController.post(carToSave);
+        HttpResponse<Car> response = carsController.create(carToSave);
 
         assertThat(response.code()).isEqualTo(201);
         assertThat(response.body()).isEqualTo(carSaved);

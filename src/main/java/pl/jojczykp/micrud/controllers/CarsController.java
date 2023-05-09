@@ -24,17 +24,17 @@ public class CarsController {
     }
 
     @Get
-    Iterable<Car> getAll() {
+    public Iterable<Car> getAll() {
         return carsRepository.findAll();
     }
 
     @Get("/{regNumber}")
-    Optional<Car> getByRegNumber(String regNumber) {
+    public Optional<Car> getByRegNumber(String regNumber) {
         return carsRepository.findByRegNumber(regNumber);
     }
 
     @Post(consumes = MediaType.APPLICATION_JSON, produces = MediaType.APPLICATION_JSON)
-    HttpResponse<Car> post(@Body Car car) {
+    public HttpResponse<Car> create(@Body Car car) {
         Car saved = carsRepository.save(car);
         return HttpResponse.created(saved);
     }

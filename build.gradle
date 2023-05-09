@@ -10,6 +10,23 @@ repositories {
     mavenCentral()
 }
 
+sourceSets {
+    itest {
+        compileClasspath += sourceSets.main.output
+        runtimeClasspath += sourceSets.main.output
+        java {
+            srcDirs("src/itest")
+        }
+    }
+}
+
+tasks.register("itest", Test) {
+    description = "Run integration tests"
+    group = "verification"
+    testClassesDirs = sourceSets.itest.output.classesDirs
+    classpath = sourceSets.itest.runtimeClasspath
+}
+
 dependencies {
     compileOnly("org.graalvm.nativeimage:svm")
 
@@ -33,18 +50,25 @@ dependencies {
 
     testImplementation("org.assertj:assertj-core")
     testImplementation("org.mockito:mockito-core")
+}
 
+configurations {
+    itestImplementation.extendsFrom(testImplementation)
+    itestRuntimeOnly.extendsFrom(testRuntimeOnly)
+    itestAnnotationProcessor.extendsFrom(annotationProcessor)
 }
 
 application {
     mainClass.set("pl.jojczykp.micrud.Application")
 }
+
 java {
     sourceCompatibility = JavaVersion.toVersion("17")
     targetCompatibility = JavaVersion.toVersion("17")
 }
 
 graalvmNative.toolchainDetection = false
+
 micronaut {
     runtime("netty")
     testRuntime("junit5")
