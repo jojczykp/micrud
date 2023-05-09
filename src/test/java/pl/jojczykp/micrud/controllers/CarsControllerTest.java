@@ -19,7 +19,7 @@ import static org.mockito.Mockito.mock;
 class CarsControllerTest {
 
     private static final Car CAR_1 = new Car(1L, "XY01ABC", "Hyundai", Colour.RED);
-    private static final Car CAR_2 = new Car(1L, "AB02XYZ", "Peugeot", Colour.BLUE);
+    private static final Car CAR_2 = new Car(2L, "AB02XYZ", "Peugeot", Colour.BLUE);
 
     @Inject
     CarsController carsController;
