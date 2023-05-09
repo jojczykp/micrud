@@ -8,40 +8,40 @@ import pl.jojczykp.micrud.model.Colour;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static java.util.Objects.nonNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @MicronautTest
 class CarsRepositoryTest {
+
+    public static final Car CAR_1 = new Car("PQ12BBC", "Bugatti", Colour.YELLOW);
+    public static final Car CAR_2 = new Car("ST12UWZ", "Mercedes", Colour.BLUE);
 
     @Inject
     CarsRepository carsRepository;
 
     @Test
     void shouldSaveSingleCar() {
-        long startCount = carsRepository.count();
+        carsRepository.save(CAR_1);
 
-        carsRepository.save(new Car("PQ12BBC", "Bugatti", Colour.YELLOW));
-
-        long endCount = carsRepository.count();
-
-        assertThat(startCount).isEqualTo(0);
-        assertThat(endCount).isEqualTo(1);
+        Iterable<Car> saved = carsRepository.findAll();
+        assertThat(saved).allMatch(hasId());
+        assertThat(saved)
+                .usingRecursiveFieldByFieldElementComparatorIgnoringFields("id")
+                .containsExactly(CAR_1);
     }
 
     @Test
     void shouldSaveMultipleCars() {
-        long startCount = carsRepository.count();
+        carsRepository.saveAll(List.of(CAR_1, CAR_2));
 
-        carsRepository.saveAll(List.of(
-                new Car("ST12UWZ", "Mercedes", Colour.BLUE),
-                new Car("CD34EFG", "Volvo", Colour.GREEN)
-        ));
-
-        long endCount = carsRepository.count();
-
-        assertThat(startCount).isEqualTo(0);
-        assertThat(endCount).isEqualTo(2);
+        Iterable<Car> saved = (carsRepository.findAll());
+        assertThat(saved).allMatch(hasId());
+        assertThat(saved)
+                .asList().usingRecursiveFieldByFieldElementComparatorIgnoringFields("id")
+                .containsExactly(CAR_1, CAR_2);
     }
 
     @Test
@@ -53,7 +53,9 @@ class CarsRepositoryTest {
         Optional<Car> maybeFound = carsRepository.findByRegNumber(regNumber);
 
         assertThat(maybeFound).isPresent();
-        assertThat(maybeFound.get()).usingRecursiveComparison().ignoringFields("id").isEqualTo(saved);
+        assertThat(maybeFound.get())
+                .usingRecursiveComparison().ignoringFields("id")
+                .isEqualTo(saved);
     }
 
     @Test
@@ -64,5 +66,9 @@ class CarsRepositoryTest {
         Optional<Car> maybeFound = carsRepository.findByRegNumber("ANOTHER");
 
         assertThat(maybeFound).isNotPresent();
+    }
+
+    private static Predicate<Car> hasId() {
+        return car -> nonNull(car.id());
     }
 }
