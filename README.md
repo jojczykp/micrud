@@ -1,6 +1,6 @@
 # MiCRUD
 
-Per project to get hands on basics of Micronaut, GraalVM and Reactor.
+Pet project to get hands on basics of Micronaut, GraalVM and Reactor.
 
 ## Run
 
