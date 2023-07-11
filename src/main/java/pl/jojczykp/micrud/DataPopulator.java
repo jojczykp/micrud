@@ -9,7 +9,6 @@ import pl.jojczykp.micrud.model.Colour;
 import pl.jojczykp.micrud.repositories.CarsRepository;
 
 import javax.transaction.Transactional;
-
 import java.util.List;
 
 import static io.micronaut.context.env.Environment.TEST;
@@ -27,12 +26,13 @@ public class DataPopulator {
     @EventListener
     @Transactional
     void init(StartupEvent event) {
-        if (carsRepository.count() == 0) {
+        Long count = carsRepository.count().block();
+        if (count == null || count == 0) {
             carsRepository.saveAll(List.of(
                     new Car("SE01QPA", "Rolls Royce", Colour.RED),
                     new Car("AB11XYZ", "Aston Martin", Colour.GREEN),
                     new Car("YZ99ABC", "Bentley", Colour.BLUE)
-            ));
+            )).blockLast();
         }
     }
 }

@@ -35,7 +35,7 @@ public class CarsITest {
 
     @BeforeEach
     void deleteAllCars(CarsRepository carsRepository) {
-        carsRepository.deleteAll();
+        carsRepository.deleteAll().block();
     }
 
     @Test

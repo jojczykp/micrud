@@ -6,15 +6,12 @@ import io.micronaut.http.annotation.Body;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.Post;
-import io.micronaut.scheduling.TaskExecutors;
-import io.micronaut.scheduling.annotation.ExecuteOn;
 import pl.jojczykp.micrud.model.Car;
 import pl.jojczykp.micrud.repositories.CarsRepository;
-
-import java.util.Optional;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @Controller("/cars")
-@ExecuteOn(TaskExecutors.IO)
 public class CarsController {
 
     private final CarsRepository carsRepository;
@@ -24,18 +21,18 @@ public class CarsController {
     }
 
     @Get
-    public Iterable<Car> getAll() {
+    public Flux<Car> getAll() {
         return carsRepository.findAll();
     }
 
     @Get("/{regNumber}")
-    public Optional<Car> getByRegNumber(String regNumber) {
+    public Mono<Car> getByRegNumber(String regNumber) {
         return carsRepository.findByRegNumber(regNumber);
     }
 
     @Post(consumes = MediaType.APPLICATION_JSON, produces = MediaType.APPLICATION_JSON)
-    public HttpResponse<Car> create(@Body Car car) {
-        Car saved = carsRepository.save(car);
-        return HttpResponse.created(saved);
+    public Mono<HttpResponse<Car>> create(@Body Car car) {
+        Mono<Car> saved = carsRepository.save(car);
+        return saved.map(HttpResponse::created);
     }
 }

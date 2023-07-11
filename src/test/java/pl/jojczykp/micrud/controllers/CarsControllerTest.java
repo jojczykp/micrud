@@ -8,11 +8,10 @@ import org.junit.jupiter.api.Test;
 import pl.jojczykp.micrud.model.Car;
 import pl.jojczykp.micrud.model.Colour;
 import pl.jojczykp.micrud.repositories.CarsRepository;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 
-import java.util.List;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 
@@ -34,34 +33,54 @@ class CarsControllerTest {
     void shouldGetAll() {
         Car car1 = new Car(1L, "XY01ABC", "Hyundai", Colour.RED);
         Car car2 = new Car(2L, "AB02XYZ", "Peugeot", Colour.BLUE);
-        given(carsRepository.findAll()).willReturn(List.of(car1, car2));
+        given(carsRepository.findAll()).willReturn(Flux.just(car1, car2));
 
-        Iterable<Car> returned = carsController.getAll();
+        Flux<Car> returned = carsController.getAll();
 
-        assertThat(returned).containsExactly(car1, car2);
+        StepVerifier.create(returned)
+                .expectNext(car1)
+                .expectNext(car2)
+                .expectComplete()
+                .verify();
     }
 
     @Test
-    void shouldGetByRegNumber() {
+    void shouldGetByValidRegNumber() {
         String regNumber = "FP77RFV";
         Car car = new Car(1L, regNumber, "Škoda", Colour.RED);
-        given(carsRepository.findByRegNumber(regNumber)).willReturn(Optional.of(car));
+        given(carsRepository.findByRegNumber(regNumber)).willReturn(Mono.just(car));
 
-        Optional<Car> returned = carsController.getByRegNumber(regNumber);
+        Mono<Car> returned = carsController.getByRegNumber(regNumber);
 
-        assertThat(returned).isPresent();
-        assertThat(returned.get()).isEqualTo(car);
+        StepVerifier.create(returned)
+                .expectNext(car)
+                .expectComplete()
+                .verify();
+    }
+
+    @Test
+    void shouldNotGetByInvalidRegNumber() {
+        String regNumber = "AX33QIL";
+        given(carsRepository.findByRegNumber(regNumber)).willReturn(Mono.empty());
+
+        Mono<Car> returned = carsController.getByRegNumber(regNumber);
+
+        StepVerifier.create(returned)
+                .expectComplete()
+                .verify();
     }
 
     @Test
     void shouldCreate() {
         Car carToSave = new Car("QQ01YYY", "Subaru", Colour.RED);
         Car carSaved = new Car(1L, "QQ01YYY", "Subaru", Colour.RED);
-        given(carsRepository.save(carToSave)).willReturn(carSaved);
+        given(carsRepository.save(carToSave)).willReturn(Mono.just(carSaved));
 
-        HttpResponse<Car> response = carsController.create(carToSave);
+        Mono<HttpResponse<Car>> response = carsController.create(carToSave);
 
-        assertThat(response.code()).isEqualTo(201);
-        assertThat(response.body()).isEqualTo(carSaved);
+        StepVerifier.create(response)
+                .expectNextMatches(res -> res.code() == 201 && carSaved.equals(res.body()))
+                .expectComplete()
+                .verify();
     }
 }

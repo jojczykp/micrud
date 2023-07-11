@@ -1,6 +1,6 @@
 # MiCRUD
 
-Per project to get hands on basics of Micronaut and GraalVM.
+Per project to get hands on basics of Micronaut, GraalVM and Reactor.
 
 ## Run
 
@@ -33,9 +33,9 @@ docker run -it --rm -p 8080:8080 micrud
 ## Test
 
 ```shell
-curl http://localhost:8080/cars -H 'Content-Type: application/json' -d '{"regNumber":"XX99ZZZ","make":"Citroën","colour":"BROWN"}'
+curl http://localhost:8080/cars -H 'Content-Type: application/json' -d '{"regNumber":"XX99ZZZ","make":"Citroën","colour":"BROWN"}' | jq .
 ```
 
 ```shell
-curl http://localhost:8080/cars
+curl http://localhost:8080/cars | jq .
 ```

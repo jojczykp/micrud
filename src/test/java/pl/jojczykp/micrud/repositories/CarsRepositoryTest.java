@@ -5,13 +5,12 @@ import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
 import pl.jojczykp.micrud.model.Car;
 import pl.jojczykp.micrud.model.Colour;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.function.Predicate;
-
-import static java.util.Objects.nonNull;
-import static org.assertj.core.api.Assertions.assertThat;
+import java.util.Objects;
 
 @MicronautTest
 class CarsRepositoryTest {
@@ -24,51 +23,68 @@ class CarsRepositoryTest {
 
     @Test
     void shouldSaveSingleCar() {
-        carsRepository.save(CAR_1);
+        carsRepository.save(CAR_1).block();
 
-        Iterable<Car> saved = carsRepository.findAll();
-        assertThat(saved).allMatch(hasId());
-        assertThat(saved)
-                .usingRecursiveFieldByFieldElementComparatorIgnoringFields("id")
-                .containsExactly(CAR_1);
+        Flux<Car> saved = carsRepository.findAll();
+
+        StepVerifier.create(saved)
+                .expectNextMatches(car ->
+                        Objects.nonNull(car.id()) &&
+                        Objects.equals(car.regNumber(), CAR_1.regNumber()) &&
+                        Objects.equals(car.make(), CAR_1.make()) &&
+                        Objects.equals(car.colour(), CAR_1.colour()))
+                .expectComplete()
+                .verify();
     }
 
     @Test
     void shouldSaveMultipleCars() {
-        carsRepository.saveAll(List.of(CAR_1, CAR_2));
+        carsRepository.saveAll(List.of(CAR_1, CAR_2)).blockLast();
 
-        Iterable<Car> saved = (carsRepository.findAll());
-        assertThat(saved).allMatch(hasId());
-        assertThat(saved)
-                .asList().usingRecursiveFieldByFieldElementComparatorIgnoringFields("id")
-                .containsExactly(CAR_1, CAR_2);
+        Flux<Car> saved = (carsRepository.findAll());
+
+        StepVerifier.create(saved)
+                .expectNextMatches(car ->
+                        Objects.nonNull(car.id()) &&
+                        Objects.equals(car.regNumber(), CAR_1.regNumber()) &&
+                        Objects.equals(car.make(), CAR_1.make()) &&
+                        Objects.equals(car.colour(), CAR_1.colour()))
+                .expectNextMatches(car ->
+                        Objects.nonNull(car.id()) &&
+                        Objects.equals(car.regNumber(), CAR_2.regNumber()) &&
+                        Objects.equals(car.make(), CAR_2.make()) &&
+                        Objects.equals(car.colour(), CAR_2.colour()))
+                .expectComplete()
+                .verify();
     }
 
     @Test
     void shouldFindByRegNumber() {
         String regNumber = "AB01CDE";
         Car saved = new Car(regNumber, "Honda", Colour.PINK);
-        carsRepository.save(saved);
+        carsRepository.save(saved).block();
 
-        Optional<Car> maybeFound = carsRepository.findByRegNumber(regNumber);
+        Mono<Car> maybeFound = carsRepository.findByRegNumber(regNumber);
 
-        assertThat(maybeFound).isPresent();
-        assertThat(maybeFound.get())
-                .usingRecursiveComparison().ignoringFields("id")
-                .isEqualTo(saved);
+        StepVerifier.create(maybeFound)
+                .expectNextMatches(car ->
+                        Objects.nonNull(car.id()) &&
+                        Objects.equals(car.regNumber(), saved.regNumber()) &&
+                        Objects.equals(car.make(), saved.make()) &&
+                        Objects.equals(car.colour(), saved.colour()))
+                .expectComplete()
+                .verify();
     }
 
     @Test
     void shouldNotFindByRegNumber() {
         Car saved = new Car("UW67QWE", "Mazda", Colour.BROWN);
-        carsRepository.save(saved);
+        carsRepository.save(saved).block();
 
-        Optional<Car> maybeFound = carsRepository.findByRegNumber("ANOTHER");
+        Mono<Car> maybeFound = carsRepository.findByRegNumber("ANOTHER");
 
-        assertThat(maybeFound).isNotPresent();
-    }
-
-    private static Predicate<Car> hasId() {
-        return car -> nonNull(car.id());
+        StepVerifier.create(maybeFound)
+                .expectComplete()
+                .verify();
     }
 }

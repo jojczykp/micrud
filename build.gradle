@@ -34,19 +34,20 @@ dependencies {
     annotationProcessor("io.micronaut.data:micronaut-data-processor")
     annotationProcessor("io.micronaut.serde:micronaut-serde-processor")
 
-    implementation("io.micronaut:micronaut-http-client")
-    implementation("io.micronaut:micronaut-jackson-databind")
     implementation("io.micronaut.serde:micronaut-serde-jackson")
     implementation("io.micronaut.data:micronaut-data-jdbc")
     implementation("io.micronaut.flyway:micronaut-flyway")
     implementation("io.micronaut.sql:micronaut-jdbc-hikari")
-    implementation("jakarta.annotation:jakarta.annotation-api")
+    implementation("io.micronaut.reactor:micronaut-reactor")
 
     runtimeOnly("ch.qos.logback:logback-classic")
     runtimeOnly("com.h2database:h2")
 
-    testImplementation("org.assertj:assertj-core")
     testImplementation("org.mockito:mockito-core")
+    testImplementation("io.projectreactor:reactor-test")
+
+    itestImplementation("org.assertj:assertj-core")
+    itestImplementation("io.micronaut:micronaut-http-client")
 }
 
 configurations {
